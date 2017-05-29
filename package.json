@@ -1,0 +1,11 @@
+{
+  "name": "ftp2gdrive-webtask",
+  "version": "0.1.0",
+  "description": "Webtask to backup files from FTP to Google Drive.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tiago Cardoso",
+  "license": "MIT"
+}
