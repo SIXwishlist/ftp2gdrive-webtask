@@ -7,5 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tiago Cardoso",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ssh2": "^0.5.5"
+  }
 }

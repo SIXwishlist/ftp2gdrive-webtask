@@ -1,0 +1,9 @@
+{
+  "secret": {
+    "host": "",
+    "port": "",
+    "username": "",
+    "password": "",
+		"path": ""
+  }
+}
