@@ -4,11 +4,13 @@
   "description": "Webtask to backup files from FTP to Google Drive.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tiago Cardoso",
   "license": "MIT",
   "dependencies": {
+    "ini": "^1.3.4",
     "ssh2": "^0.5.5"
   }
 }
