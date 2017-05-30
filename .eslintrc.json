@@ -1,0 +1,39 @@
+{
+	"extends": [
+		"eslint:recommended",
+		"standard",
+		"plugin:promise/recommended"
+	],
+	"plugins": [
+		"standard",
+		"promise"
+	],
+	"rules": {
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"semi": [
+			"error",
+			"always"
+		],
+		"no-tabs": [
+			"off"
+		],
+		"space-before-function-paren": [
+			"off"
+		],
+		"comma-dangle": [
+			"off"
+		],
+		"spaced-comment": [
+			"off"
+		],
+		"no-console": [
+			"off"
+		]
+	}
+}
