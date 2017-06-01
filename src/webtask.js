@@ -1,10 +1,12 @@
-var Client = require('ssh2').Client;
-var google = require('googleapis');
+'use latest';
+
+const SSH2Client = require('ssh2').Client;
+const google = require('googleapis');
 
 module.exports = function(ctx, cb) {
-	var OAuth2 = google.auth.OAuth2;
+	const OAuth2 = google.auth.OAuth2;
 
-	var oauth2Client = new OAuth2(
+	const oauth2Client = new OAuth2(
 		ctx.secrets.GOOGLE_CLIENT_ID,
 		ctx.secrets.GOOGLE_CLIENT_SECRET
 	);
@@ -16,15 +18,16 @@ module.exports = function(ctx, cb) {
 
 	listFiles(oauth2Client);
 
-	var conn = new Client();
-	conn.on('ready', function() {
-		console.log('Client :: ready');
-		conn.sftp(function(err, sftp) {
+	const ssh2Conn = new SSH2Client();
+	ssh2Conn.on('ready', function() {
+		console.log('SSH2Client :: ready');
+
+		ssh2Conn.sftp(function(err, sftp) {
 			if (err) throw err;
 			sftp.readdir(ctx.secrets.FTP_PATH, function(err, list) {
 				if (err) throw err;
 				console.dir(list);
-				conn.end();
+				ssh2Conn.end();
 			});
 		});
 	}).connect({
@@ -38,7 +41,7 @@ module.exports = function(ctx, cb) {
 };
 
 function listFiles(auth) {
-	var service = google.drive('v3');
+	const service = google.drive('v3');
 	service.files.list({
 		auth: auth,
 		pageSize: 10,
@@ -48,13 +51,13 @@ function listFiles(auth) {
 			console.log('The API returned an error: ' + err);
 			return;
 		}
-		var files = response.files;
+		const files = response.files;
 		if (files.length === 0) {
 			console.log('No files found.');
 		} else {
 			console.log('Files:');
-			for (var i = 0; i < files.length; i++) {
-				var file = files[i];
+			for (let i = 0; i < files.length; i++) {
+				const file = files[i];
 				console.log('%s (%s)', file.name, file.id);
 			}
 		}

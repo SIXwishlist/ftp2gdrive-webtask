@@ -1,7 +1,7 @@
-var fs = require('fs');
-var ini = require('ini');
-var ftp2gdrive = require('./src/webtask');
+const fs = require('fs');
+const ini = require('ini');
+const ftp2gdrive = require('./src/webtask');
 
-var secrets = ini.parse(fs.readFileSync('./config/secrets.txt', 'utf-8'));
+const secrets = ini.parse(fs.readFileSync('./config/secrets.txt', 'utf-8'));
 
 ftp2gdrive({secrets: secrets}, function() {});
