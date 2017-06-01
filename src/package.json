@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "googleapis": "^19.0.0",
+    "ssh2": "^0.5.5"
+  }
+}
