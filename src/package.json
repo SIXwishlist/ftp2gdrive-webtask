@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "googleapis": "^19.0.0",
+    "dateformat": "^2.0.0",
+	"googleapis": "^19.0.0",
     "ssh2": "^0.5.5"
   }
 }
