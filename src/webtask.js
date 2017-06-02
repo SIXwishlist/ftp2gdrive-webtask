@@ -44,7 +44,7 @@ module.exports = function(ctx, cb) {
 };
 
 function getFileName(filePath, date) {
-	return (dateFormat(date, 'yyyymmddHHMMss') + '_' +
+	return (dateFormat(date, 'UTC:yyyymmddHHMMss') + '_' +
 		filePath.substring(filePath.lastIndexOf('/') + 1));
 }
 
