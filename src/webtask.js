@@ -16,7 +16,9 @@ module.exports = function(ctx, cb) {
 		refresh_token: ctx.secrets.GOOGLE_REFRESH_TOKEN
 	});
 
-	listFiles(oauth2Client);
+	const drive = google.drive('v3');
+	listFiles(drive, oauth2Client, ctx.secrets.DRIVE_BACKUP_FOLDER_ID);
+	uploadFile(drive, oauth2Client, ctx.secrets.DRIVE_BACKUP_FOLDER_ID);
 
 	const ssh2Conn = new SSH2Client();
 	ssh2Conn.on('ready', function() {
@@ -40,10 +42,10 @@ module.exports = function(ctx, cb) {
 	cb(null, { result: 'success' });
 };
 
-function listFiles(auth) {
-	const service = google.drive('v3');
-	service.files.list({
+function listFiles(drive, auth, folderId) {
+	drive.files.list({
 		auth: auth,
+		q: "'" + folderId + "'" + ' in parents',
 		pageSize: 10,
 		fields: 'nextPageToken, files(id, name)'
 	}, function(err, response) {
@@ -62,4 +64,29 @@ function listFiles(auth) {
 			}
 		}
 	});
+}
+
+function uploadFile(drive, auth, folderId) {
+	var fileMetadata = {
+		name: 'test.txt',
+		parents: [folderId]
+	};
+	var media = {
+		//mimeType: 'text/plain',
+		body: 'hello...'
+	};
+	drive.files.create({
+		auth: auth,
+		resource: fileMetadata,
+		media: media,
+		fields: 'id'
+	}, function(err, file) {
+		if (err) {
+			// Handle error
+			console.log(err);
+		} else {
+			console.log('File Id: ', file.id);
+		}
+	});
+
 }
