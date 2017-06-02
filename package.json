@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint *.js src/**/*.js"
+    "lint": "eslint *.js src/**/*.js",
+	"deploy": "wt create src/webtask.js --name ftp2gdrive-webtask --secrets-file config/secrets.txt"
   },
   "author": "Tiago Cardoso",
   "license": "MIT",
