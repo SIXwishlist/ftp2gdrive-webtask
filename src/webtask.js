@@ -4,7 +4,7 @@ const SSH2Client = require('ssh2').Client;
 const google = require('googleapis');
 const dateFormat = require('dateformat');
 
-module.exports = function(ctx, cb) {
+module.exports = function (ctx, cb) {
 	const OAuth2 = google.auth.OAuth2;
 
 	const oauth2Client = new OAuth2(
@@ -17,20 +17,31 @@ module.exports = function(ctx, cb) {
 		refresh_token: ctx.secrets.GOOGLE_REFRESH_TOKEN
 	});
 
-	const drive = google.drive('v3');
+	const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
 	const ssh2Conn = new SSH2Client();
-	ssh2Conn.on('ready', function() {
+	ssh2Conn.on('ready', function () {
 		console.log('SSH2Client :: ready');
 
-		ssh2Conn.sftp(function(err, sftp) {
+		ssh2Conn.sftp(function (err, sftp) {
 			if (err) throw err;
 
 			const filePath = ctx.secrets.FTP_PATH;
-			uploadFile(drive, oauth2Client, ctx.secrets.DRIVE_BACKUP_FOLDER_ID,
+			uploadFile(drive, ctx.secrets.DRIVE_BACKUP_FOLDER_ID,
 				getFileName(filePath, new Date()),
-				sftp.createReadStream(filePath), function() {
+				sftp.createReadStream(filePath),
+				function () {
 					ssh2Conn.end();
+					listLastFiles(drive, ctx.secrets.DRIVE_BACKUP_FOLDER_ID,
+						function (files) {
+							// files.forEach(function (file) {
+							// 	console.log('Found file: ', file.id, file.name, file.md5Checksum);
+							// });
+
+							if ((files.length >= 2) && (files[0].md5Checksum === files[1].md5Checksum)) {
+								deleteFile(drive, files[1].id);
+							}
+						});
 				});
 		});
 	}).connect({
@@ -48,7 +59,7 @@ function getFileName(filePath, date) {
 		filePath.substring(filePath.lastIndexOf('/') + 1));
 }
 
-function uploadFile(drive, auth, folderId, fileName, fileStream, callback) {
+function uploadFile(drive, folderId, fileName, fileStream, callback) {
 	var fileMetadata = {
 		name: fileName,
 		parents: [folderId]
@@ -58,16 +69,44 @@ function uploadFile(drive, auth, folderId, fileName, fileStream, callback) {
 		body: fileStream//'hello...'
 	};
 	drive.files.create({
-		auth: auth,
 		resource: fileMetadata,
 		media: media,
 		fields: 'id'
-	}, function(err, file) {
+	}, function (err, file) {
 		if (err) {
 			throw err;
 		} else {
-			console.log('File Id: ', file.id);
+			console.log('New file Id: ', file.id);
 			callback();
+		}
+	});
+}
+
+function listLastFiles(drive, folderId, callback) {
+	drive.files.list({
+		q: "'" + folderId + "' in parents and not trashed",
+		fields: 'files(id, name, md5Checksum)',
+		spaces: 'drive',
+		orderBy: 'name desc',
+		pageSize: 2
+	}, function (err, res) {
+		if (err) {
+			throw err;
+		} else {
+			callback(res.files);
+		}
+	});
+}
+
+function deleteFile(drive, fileId) {
+	drive.files.update({
+		fileId: fileId,
+		resource: { 'trashed': true }
+	}, function (err, res) {
+		if (err) {
+			throw err;
+		} else {
+			console.log('Deleted file with id ' + res.id);
 		}
 	});
 }
